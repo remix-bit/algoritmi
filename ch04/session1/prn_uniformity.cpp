@@ -9,30 +9,32 @@ using namespace std;
 int main() {
   srand48(time(NULL));
 
-  ofstream fdata;        // declare Output stream class to operate on files 
+  ofstream fdata;  // declaring output stream 
                          
   fdata.open("prn_uniformity.dat"); // open output file 
 
   for (int i = 0; i < 1000; i++){ 
     fdata << i << "  " << drand48() << endl;
   }
+
   fdata.close();  
 
-  int N = 10;
-  fdata.open("prn_moments.dat");
-  for (int i = 1; i < 18; i++) {
+  fdata.open("prn_momenta.dat");
+  
+  for (int N = 1; N < 100000; N*=2) {
     double mean = 0.0;
     double mean_sq = 0.0;
     double x;
+   
     for (int j = 0; j < N; j++) {
       x = drand48();
       mean += x;
       mean_sq += x * x;
     }
+    
     mean = (mean / (double) N) - 0.5;
-    mean_sq = (mean_sq / (double) N ) - (double) 1.0 / (double) 3.0;
-    fdata << N << "  " << mean << "  " << mean_sq << endl;
-    N *= 2;
+    mean_sq = (mean_sq / (double) N ) - ((double) 1.0 / (double) 3.0);
+    fdata << N << "  " << fabs(mean) << "  " << fabs(mean_sq) << endl;
   }
 
   return 0;
