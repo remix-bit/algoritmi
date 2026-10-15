@@ -41,6 +41,9 @@ int main() {
       simpson(taylorSi, a, b, n) << endl;
   }
 
+  // to compute everything do the successive integral by adding stuff
+  // step by step
+
   return 0;
 }
 
