@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <cmath>
 
@@ -43,6 +44,22 @@ int main() {
 
   // to compute everything do the successive integral by adding stuff
   // step by step
+  
+  // now we want to evaluate Si(x) in [0,25], and produce a plot
+
+  ofstream fdata;
+  fdata.open("Si(x).dat");
+
+  double Si_int = 0.0;
+  double n;
+
+  for (int i = 0; i < 2500; i++) {
+    n = (double) i * 0.01;
+    Si_int += gauss(Si, n, n + 0.01, 1, 3);
+    fdata <<  n+0.01 << "  " << Si_int << endl;
+  }
+
+  fdata.close();
 
   return 0;
 }
