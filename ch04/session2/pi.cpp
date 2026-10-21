@@ -24,7 +24,8 @@ int main() {
   // for the second point of the problem: you shouldn't restart the
   // integration for each N. simply add a point until the error reaches
   // the tolerance required.
-  // the implementation here is worse.
+  // the implementation here is worse. however, i think it is needed for
+  // the third point: the samples should be independent (?)
   do {
     Ninside = 0;
     N      *= 2; // if you want better performance add a constant!

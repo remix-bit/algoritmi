@@ -6,66 +6,63 @@ double RectangularQuad(double (*F)(double), double a, double b, int N)  {
   double sum = 0.0;
 
   double h;
-  h = (b - a) / (double)N;
+  h = (b - a) / (double)N;   // = interval width
 
-  // multiply by h outside of the loop
   for (int i = 0; i < N; i++) {
-    sum += F(a + i * h);
+    sum += F(a + i * h);    // sum F(x_i) where x_i = a + i * h
   }
 
-  return sum * h;
+  return sum * h;           // sum F(x_i) * h (are of each rectangle)
 }
 
 double TrapezoidQuad(double (*F)(double), double a, double b, int N)  {
   double sum = 0.0;
 
   double h;
-  h = (b - a) / (double)N;
+  h = (b - a) / (double)N;   // = interval width
 
   for (int i = 1; i < N; i++) {
-    sum += F(a + i * h);
+    sum += F(a + i * h);     // sum 0.5 * F(x_i) + 0.5 * F(x_i)
+                             // where x_i = a + i * h
+                             // (every x_i delimits two intervals)
   }
 
-  // first and last elements: excluding them is the best way (no ifs!)
+  // sum 0.5 * F(a) + 0.5 F(b) 
+  // (only point that delimit a single interval)
   sum += 0.5 * (F(a) + F(b));
 
-  return sum * h;
+  return sum * h;            // sum 0.5 * (F(x_i) + F(x_i+1)) * h
 }
 
 double SimpsonQuad(double (*F)(double), double a, double b, int N)  {
   double sum = 0.0;
 
-  // we should check the parity of N
+  // N must be even
   if (N % 2 != 0) {
     std::cout << "N = " << N << ", but it should be even" << std::endl;
     return 1.;
   }
 
   double h;
-  h = (b - a) / (double)N;
+  h = (b - a) / (double)N;   // = interval width
 
   for (int i = 1; i < N; i++) {
-    if (i % 2 == 1) { // odd elements
-      sum += (4.) * F(a + i * h);
-    } else {         // even elements
-      sum += (2.) * F(a + i * h);
+    if (i % 2 == 1) {             // odd elements are weighted by 4
+      sum += (4.) * F(a + i * h); // 4 * F(x_i)
+    } else {                      // even elements by 2
+      sum += (2.) * F(a + i * h); // 2 * F(x_i)
     }
   }
-  // the best way is defining w = 4, and then w = 6 - w at the end
-  // to alternate for each iteration between 4 and 6
 
-  // first and last elements
+  // the first and last elements are weighted by 1
   sum += F(a) + F(b);
 
-  // everything at the end
-  return sum * h / 3.;
+  return sum * h / 3.;  // (h / 3) * (F_0 + 2 * F_1 + 4 * F_2 + ...  + F_N)
 }
 
 double GaussQuad(double (*F)(double), double a, double b, int N, int Ng) {
-  double w[4], t[4]; // they should be inited correclty: no runtime init
-                     // (mignone prefers it this way)
+  double w[4], t[4]; // init of weigths and sample points for Ng < 5
 
-  // defining weights and parameters for each choice of Ng (< 5)
   switch (Ng) {
     case 1:
       w[0] = 2.0; t[0] = 0.0;
@@ -99,28 +96,28 @@ double GaussQuad(double (*F)(double), double a, double b, int N, int Ng) {
       return 1.;
   }
 
-  double sum  = 0.0;
-  double sumk = 0.0;
+  double sum  = 0.0;  // = integral across all intervals
+  double sumk = 0.0;  // = (gauss) integral over each interval
 
-  double x0, x1;     // extremes for each interval
+  double x0, x1;      // = extremes for each interval
 
-  double h = (b - a) / (double) N; // defining width of intervals
+  double h = (b - a) / (double) N; // = width of intervals
 
-  for (int i = 0; i < N; i++) { // looping over total intervals
-    x0 = a + i * h;
+  for (int i = 0; i < N; i++) { // looping over intervals
+    x0 = a + i * h;             // init extremes of intervals
     x1 = a + (i + 1) * h;
 
     sumk = 0.0;
 
-    for (int k = 0; k < Ng; k++) {
+    for (int k = 0; k < Ng; k++) {  // looping over subintervals
       // adding contribution from each gauss interval ( h == x1 - x0)
       sumk += w[k] * F(0.5 * h * t[k] + 0.5 * (x1 + x0));
     }
-    // adding to total integral (weighted at the end)
+    // adding each gaussian integral to total integral 
     sum += sumk;
   }
 
-  return sum * 0.5 * h;
+  return sum * 0.5 * h; // weighting by 0.5 * h at the end for performance
 }
 
 double GaussQuad2D(double (*F)(double, double), 
@@ -128,10 +125,8 @@ double GaussQuad2D(double (*F)(double, double),
     double ya, double yb, 
     int N, int Ng) {
 
-  double w[4], t[4]; // they should be inited correclty: no runtime init
-                     // (mignone prefers it this way)
-
-  // defining weights and parameters for each choice of Ng (< 5)
+  double w[4], t[4];  // init of weights and sample points for Ng < 5
+                    
   switch (Ng) {
     case 1:
       w[0] = 2.0; t[0] = 0.0;
@@ -165,10 +160,10 @@ double GaussQuad2D(double (*F)(double, double),
       return 1.;
   }
 
-  double dx = (xb - xa) / (double) N;
-  double dy = (yb - ya) / (double) N;
+  double dx = (xb - xa) / (double) N; // = step in x direction
+  double dy = (yb - ya) / (double) N; // = step in y direction
 
-  double sum = 0.0;
+  double sum = 0.0; // = total integral
 
   // loops to define squares on which gaussian integration is performed
   for(int j = 0; j < N; j++) {
@@ -184,7 +179,7 @@ double GaussQuad2D(double (*F)(double, double),
           sumx += w[ik] * F(xc + 0.5 * dx * t[ik], yc + 0.5 * dy * t[jk]); 
         }
         sumx *= 0.5 * dx;
-        sumy += w[jk]* sumx; // this is the weighting for gauss int on y
+        sumy += w[jk]* sumx; // this is the gauss weighting on y
       }
       sumy *= 0.5 * dy;
       sum += sumy;
