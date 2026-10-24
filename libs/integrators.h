@@ -1,5 +1,7 @@
-double RectangularQuad(double(*)(double), double, double, int);
-double TrapezoidQuad(double(*)(double), double, double, int);
-double SimpsonQuad(double(*)(double), double, double, int);
-double GaussQuad(double(*)(double), double, double, int, int);
-double GaussQuad2D(double(*)(double,double), double, double, double, double, int, int);
+double RectangularQuad(double (*F)(double), double a, double b, int N) 
+
+double TrapezoidQuad(double (*F)(double), double a, double b, int N)  
+
+double SimpsonQuad(double (*F)(double), double a, double b, int N)  
+
+double GaussQuad(double (*F)(double), double a, double b, int N, int Ng) 
