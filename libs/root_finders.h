@@ -8,3 +8,6 @@ int Secant(double (*)(double), double, double,
 
 int Newton(double (*)(double), double (*)(double), 
            double, double, double, double, double &);
+
+int Bracket(double (*)(double), double, double,
+            int, double*, double*, int&);

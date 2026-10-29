@@ -81,7 +81,8 @@ int FalsePosition(double (*func) (double), double a, double b,
   double fa = func(a);
   if (fa == 0) {
     zero = a;
-    std::cout << "a = " << a << " is a zero: succesful false position" << std::endl;
+    std::cout << "a = " << a << " is a zero: succesful false position" 
+              << std::endl;
     return 0;
   }
 
@@ -89,7 +90,8 @@ int FalsePosition(double (*func) (double), double a, double b,
   double fb = func(b);
   if (fb == 0) {
     zero = b;
-    std::cout << "b = " << b << " is a zero: succesful false position" << std::endl;
+    std::cout << "b = " << b << " is a zero: succesful false position" 
+              << std::endl;
     return 0;
   }
 
@@ -105,7 +107,8 @@ int FalsePosition(double (*func) (double), double a, double b,
   // while del > xtol, and f(zero) > ytol
   do {
     if (counter > 128) {
-      std::cout << "too many iterations: unsuccesful false position" << std::endl;
+      std::cout << "too many iterations: unsuccesful false position" 
+                << std::endl;
       return 1;
     }
 
@@ -243,6 +246,49 @@ int Newton(double (*func) (double), double(*derivative) (double),
          << "; xc = " << zero 
          << "; dx = " << del << std::endl;
     #endif
+  }
+
+  return 0;
+}
+
+int Bracket(double (*func) (double), double a, double b,
+            int n, double *start, double *end, int &possibleroots) {
+  double len = b - a;
+  double del = len / n;
+
+  // init of the extremes for the first bracket
+  double c = a;
+  double d = a + del;
+
+  // init of function values for the first bracket
+  double fc = func(c);
+  double fd = func(d);
+
+  possibleroots = 0;
+
+  for (int i = 0; i < n + 1; i++) {
+    #if ROOTFIND_DEBUG
+    std::cout << "(c,d) = (" << c << ", " << d << ");  "
+         << "(fc, fd) = (" << fc << ", " << fd  << ");  " << std::endl;
+    #endif
+
+    if (fc * fd < 0) {
+      start[possibleroots] = c;
+      end[possibleroots]   = d;
+      possibleroots++;
+      #if ROOTFIND_DEBUG
+      std::cout << " ^ added!" << std::endl;
+      #endif
+    }
+
+    // update to extremes of next bracket
+    c = a + del * i;
+    d = a + del * (i + 1);
+
+    // update function values at extremes of next bracket
+    // (only one evaluation is needed!)
+    fc = fd;
+    fd = func(d);
   }
 
   return 0;
