@@ -23,21 +23,20 @@ double Energy(double x, double v) {
   return (v * v + omegax * omegax) * 0.5;
 }
 
-// we should also check what happens to energy and angular momentum
-// during the time evolution: are they actually conserved?
+
 int main() {
   const int neq = 2;
 
   // initial conditions
   double xs = 1;
-  double v  = 0;
+  double vs = 0;
 
   ofstream fdata;
 
-  double Y[2] = {xs, v}; 
+  double Y[2] = {xs, vs}; 
 
   double T  = M_PI * 2.0 / (OMEGA);      // = harmonic oscillator period
-  double dt = T * 0.02;     // = time step (inited later) 
+  double dt = T * 0.02;     // = time step
   double t  = 0;            // = live time
 
   int N = 10000;            // = max number of steps
@@ -47,15 +46,15 @@ int main() {
 
   fdata << setiosflags(ios_base::scientific) << setprecision(6);
 
-  fdata << t << "  " << Y[0] << "  " << Y[1] << 
+  fdata << t << "  " << Y[0] << "  " << Y[1] 
         << "  " << Energy(Y[0], Y[1]) << endl;
 
 
   for (int i = 0; i < N; i++) {
-    RK4Step(t, Y, dYdt, dt, neq); 
+    RK2Step(t, Y, dYdt, dt, neq); 
     t += dt;
 
-    fdata << t << "  " << Y[0] << "  " << Y[1] << 
+    fdata << t << "  " << Y[0] << "  " << Y[1] 
           << "  " << Energy(Y[0], Y[1]) << endl;
 
     if (t / T > Noscillations) break;
@@ -79,7 +78,7 @@ int main() {
     t += dt;
 
     fdata << t << "  " << pos[0] << "  " << vel[0] 
-          << Energy(pos[0], vel[0]) << endl;
+          << "  " << Energy(pos[0], vel[0]) << endl;
 
     if (t / T > Noscillations) break;
   }
